@@ -1,0 +1,6 @@
+[package]
+name = "binarytree"
+version = "0.1.0"
+authors = ["David <david.boeryd@gmail.com>"]
+
+[dependencies]
