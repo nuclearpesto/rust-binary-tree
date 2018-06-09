@@ -1,20 +1,27 @@
 mod tree {
     use std::rc::Rc;
     #[derive(Debug)]
-    struct BTree {
-        root: Node
+    pub struct BTree {
+        root: Rc<Node>,
     }
-    impl Btree{
-        fn insert(key : &str){
-
+    impl BTree {
+        pub fn insert(tree: &BTree, key: &str) -> BTree {
+            BTree {
+                root: Node::insert(&Some(Rc::clone(&tree.root)), key).unwrap(),
+            }
+        }
+        pub fn new(key: &str) -> BTree {
+            BTree {
+                root: Node::insert(&None, key).unwrap(),
+            }
         }
     }
 
     #[derive(Debug)]
     struct Node {
-         left: Option<Rc<Node>>,
-         right: Option<Rc<Node>>,
-         key: String,
+        left: Option<Rc<Node>>,
+        right: Option<Rc<Node>>,
+        key: String,
     }
 
     impl Node {
@@ -46,17 +53,20 @@ mod tree {
 
             match key.cmp(&tree.key) {
                 Less => {
+                    println!("{} is less than {}, recursing left", key, &tree.key);
                     left = Node::insert(&tree.left, key);
                     right = Node::clone_node(&tree.right);
                     newkey = tree.key.clone();
                 }
                 More => {
-                    left = Node::insert(&tree.left, key);
+                    println!("{} is more than {}, recursing right", key, &tree.key);
+                        left = Node::insert(&tree.left, key);
                     right = Node::clone_node(&tree.right);
                     newkey = tree.key.clone();
                 }
                 Equal => {
-                    left = Node::insert(&tree.left, key);
+                    println!("{} is equal to {}, clonin node", key, &tree.key);
+                    left = Node::clone_node(&tree.left);
                     right = Node::clone_node(&tree.right);
                     newkey = tree.key.clone();
                 }
@@ -68,32 +78,39 @@ mod tree {
             }))
         }
     }
-}
 
-fn main() {
-    let tree = tree::Node {
-        left: None,
-        right: None,
-        key: "ab".to_string(),
-    };
-}
+    #[cfg(test)]
+    mod test {
 
-#[cfg(test)]
-mod test{
+        use tree::BTree;
+        #[test]
+        fn new_btree_works() {
+            let tree = BTree::new("hello");
+            assert!(tree.root.left.is_none());
+            assert!(tree.root.right.is_none());
+            assert!(tree.root.key == "hello");
+        }
+        #[test
+        fn insert_one_works() {
+            let tree = BTree::new("hello");
+            let tree2 = BTree::insert(&tree, "goodbye");
+            //first tree remains unaltered
+            assert!(tree.root.left.is_none());
+            assert!(tree.root.right.is_none());
+            assert!(tree.root.key == "hello");
 
-    use tree::Node;
-    #[test]
-    fn add_one_node(){
-        let tree = Node {
-            left: None,
-            right: None,
-            key: "ab".to_string(),
-        };
+            //second tree root right has a new node
+            assert!(tree2.root.left.is_some());
+            assert!(tree2.root.right.is_none());
+            assert_eq!(tree2.root.left.as_ref().unwrap().key, "goodbye");
 
-       let newtree = Node::insert(&tree,"cb");
+
+
+
+
+        }
+
     }
-
-
-
-
 }
+
+fn main() {}
