@@ -1,61 +1,99 @@
 mod tree {
     use std::rc::Rc;
+    #[derive(Debug)]
+    struct BTree {
+        root: Node
+    }
+    impl Btree{
+        fn insert(key : &str){
 
-    pub struct Tree {
-        pub left: Option<Rc<Tree>>,
-        pub right: Option<Rc<Tree>>,
-        pub key: String,
+        }
     }
 
-    impl Tree {
-        fn insert(tree: &Option<Rc<Tree>>, key: &str) -> (Option<Rc<Tree>>) {
+    #[derive(Debug)]
+    struct Node {
+         left: Option<Rc<Node>>,
+         right: Option<Rc<Node>>,
+         key: String,
+    }
+
+    impl Node {
+        pub fn insert(tree: &Option<Rc<Node>>, key: &str) -> (Option<Rc<Node>>) {
             match tree {
-                None => new_leaf(),
-                Some(&tree) => tree_by_key(tree);
-                }
+                None => Node::new_leaf(key),
+                Some(tree) => Node::tree_by_key(tree, key),
             }
         }
 
-        fn append_node(node: Option<Rc<Tree>>) -> (Option<Rc<Tree>>){
-            match node{
+        fn clone_node(node: &Option<Rc<Node>>) -> (Option<Rc<Node>>) {
+            match node {
                 None => None,
-                Some(rc) => Some(Rc::clone(rc))
-
+                Some(rc) => Some(Rc::clone(rc)),
             }
         }
-        fn new_leaf(key: &str) -> (Option<Rc<Tree>>){
-            Some(Rc::new(Tree {
+        fn new_leaf(key: &str) -> (Option<Rc<Node>>) {
+            Some(Rc::new(Node {
                 left: None,
                 right: None,
-                key: key.to_string()
+                key: key.to_string(),
             }))
         }
 
-        fn tree_by_key(&tree) ->( Option<Rc<Tree>>){
-            match key.cmp(tree.key) {
-                Less => Some(Rc::new(Tree{
-                    left: Tree.insert(&tree.left, key),
-                    key: tree.key.clone(),
-                    right: append_node(&tree.right)
-                })),
-                More => Some(Rc::new(Tree{
-                    left: append_node(&tree.left),
-                    key: tree.key.clone(),
-                    right: insert(&tree.right)
-                })),
-                Equal => {
-                    Rc::clone(:)
+        fn tree_by_key(tree: &Rc<Node>, key: &str) -> (Option<Rc<Node>>) {
+            let left: Option<Rc<Node>>;
+            let right: Option<Rc<Node>>;
+            let newkey: String;
+
+            match key.cmp(&tree.key) {
+                Less => {
+                    left = Node::insert(&tree.left, key);
+                    right = Node::clone_node(&tree.right);
+                    newkey = tree.key.clone();
                 }
-
-    }
-
-
+                More => {
+                    left = Node::insert(&tree.left, key);
+                    right = Node::clone_node(&tree.right);
+                    newkey = tree.key.clone();
+                }
+                Equal => {
+                    left = Node::insert(&tree.left, key);
+                    right = Node::clone_node(&tree.right);
+                    newkey = tree.key.clone();
+                }
+            };
+            Some(Rc::new(Node {
+                left,
+                right,
+                key: newkey,
+            }))
+        }
     }
 }
+
 fn main() {
-    let tree = tree::Tree {
+    let tree = tree::Node {
         left: None,
         right: None,
         key: "ab".to_string(),
     };
+}
+
+#[cfg(test)]
+mod test{
+
+    use tree::Node;
+    #[test]
+    fn add_one_node(){
+        let tree = Node {
+            left: None,
+            right: None,
+            key: "ab".to_string(),
+        };
+
+       let newtree = Node::insert(&tree,"cb");
+    }
+
+
+
+
 }
