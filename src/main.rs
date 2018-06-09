@@ -90,7 +90,7 @@ mod tree {
             assert!(tree.root.right.is_none());
             assert!(tree.root.key == "hello");
         }
-        #[test
+        #[test]
         fn insert_one_works() {
             let tree = BTree::new("hello");
             let tree2 = BTree::insert(&tree, "goodbye");
